@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { DecorTheme } from '../types';
-import { IndianRupee, Sparkles, CheckCircle2, ShoppingBag, Wand2, Loader2, Download, ImageIcon, Check } from 'lucide-react';
+import { DecorTheme, DecorationItem } from '../types';
+import { IndianRupee, Sparkles, CheckCircle2, ShoppingBag, Wand2, Loader2, Download, ImageIcon, Check, ExternalLink, ShoppingCart } from 'lucide-react';
 
 interface ThemeDetailsProps {
   theme: DecorTheme;
@@ -26,6 +26,20 @@ export const ThemeDetails: React.FC<ThemeDetailsProps> = ({
   const currentPreviewUrl = theme.generatedImageUrls && theme.generatedImageUrls.length > 0 
     ? theme.generatedImageUrls[selectedImageIndex] 
     : null;
+
+  const getSearchUrl = (item: DecorationItem) => {
+    const query = encodeURIComponent(item.name);
+    const sourceLower = item.source.toLowerCase();
+    
+    if (sourceLower.includes('amazon')) {
+      return `https://www.amazon.in/s?k=${query}`;
+    } else if (sourceLower.includes('flipkart')) {
+      return `https://www.flipkart.com/search?q=${query}`;
+    } else {
+      // Default fallback to Google Shopping or General Search if source is local/generic
+      return `https://www.google.com/search?tbm=shop&q=${query}`;
+    }
+  };
 
   return (
     <div className="animate-fade-in space-y-8">
@@ -262,20 +276,23 @@ export const ThemeDetails: React.FC<ThemeDetailsProps> = ({
           <span className="text-xs text-slate-500">*Prices are estimated Indian market rates</span>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="w-full text-left border-collapse">
             <thead className="bg-slate-100 text-slate-600 text-sm uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-4 font-semibold">Item</th>
                 <th className="px-6 py-4 font-semibold">Source</th>
                 <th className="px-6 py-4 font-semibold">Qty</th>
                 <th className="px-6 py-4 font-semibold text-right">Price (INR)</th>
-                <th className="px-6 py-4 font-semibold">Why?</th>
+                <th className="px-6 py-4 font-semibold text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {theme.items.map((item, idx) => (
-                <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-medium text-slate-800">{item.name}</td>
+                <tr key={idx} className="hover:bg-slate-50 transition-colors group">
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-slate-800">{item.name}</div>
+                    <div className="text-xs text-slate-500 mt-1 italic">{item.reason}</div>
+                  </td>
                   <td className="px-6 py-4 text-slate-600 text-sm">
                     <span className="inline-block px-2 py-1 rounded-md bg-white border border-slate-200 text-xs">
                       {item.source}
@@ -285,7 +302,17 @@ export const ThemeDetails: React.FC<ThemeDetailsProps> = ({
                   <td className="px-6 py-4 text-slate-800 font-semibold text-right">
                     ₹{item.approxPriceINR.toLocaleString('en-IN')}
                   </td>
-                  <td className="px-6 py-4 text-slate-500 text-sm italic">{item.reason}</td>
+                  <td className="px-6 py-4 text-center">
+                    <a 
+                      href={getSearchUrl(item)} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-indigo-200"
+                    >
+                      <span className="hidden sm:inline">Buy Now</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </td>
                 </tr>
               ))}
               <tr className="bg-slate-50 font-bold">
