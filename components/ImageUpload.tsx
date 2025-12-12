@@ -17,7 +17,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected }) => 
     const reader = new FileReader();
     reader.onloadend = () => {
       const result = reader.result as string;
-      // Remove data URL prefix for API
       const base64 = result.split(',')[1];
       onImageSelected(base64, result);
     };
@@ -40,19 +39,19 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected }) => 
     >
       <label 
         htmlFor="image-upload" 
-        className="flex flex-col items-center justify-center w-full h-64 border-2 border-indigo-300 border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-indigo-50 transition-colors duration-300 group"
+        className="flex flex-col items-center justify-center w-full h-80 border-2 border-indigo-200 border-dashed rounded-3xl cursor-pointer bg-white/50 hover:bg-white/80 transition-all duration-300 group hover:border-violet-400 hover:shadow-xl backdrop-blur-sm"
       >
         <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-          <div className="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:scale-110 transition-transform duration-300">
-            <Upload className="w-8 h-8 text-indigo-500" />
+          <div className="bg-white p-5 rounded-2xl shadow-md mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+            <Upload className="w-10 h-10 text-violet-600" />
           </div>
-          <p className="mb-2 text-lg font-semibold text-slate-700">
+          <p className="mb-3 text-xl font-heading font-bold text-slate-800">
             Upload your room photo
           </p>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 font-medium">
             Click to browse or drag and drop
           </p>
-          <p className="text-xs text-slate-400 mt-2">
+          <p className="text-xs text-slate-400 mt-4 bg-slate-100 px-3 py-1 rounded-full">
             Supports JPG, PNG (Max 10MB)
           </p>
         </div>
