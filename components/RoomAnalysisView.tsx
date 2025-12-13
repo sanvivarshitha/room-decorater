@@ -1,16 +1,40 @@
 
 import React from 'react';
 import { RoomAnalysis } from '../types';
-import { Home, Lightbulb, MapPin, Palette, Shield, AlertTriangle, CheckCircle2, Ruler, Scan, Info, Sun, Zap, Camera, Focus, Aperture, Users, Move, ArrowRightLeft, Eraser, MoveRight } from 'lucide-react';
+import { Home, Lightbulb, MapPin, Palette, Shield, AlertTriangle, CheckCircle2, Ruler, Scan, Info, Sun, Zap, Camera, Focus, Aperture, Users, Move, ArrowRightLeft, Eraser, MoveRight, ImageIcon } from 'lucide-react';
 
 interface RoomAnalysisViewProps {
   analysis: RoomAnalysis;
+  imageUrl?: string | null;
 }
 
-export const RoomAnalysisView: React.FC<RoomAnalysisViewProps> = ({ analysis }) => {
+export const RoomAnalysisView: React.FC<RoomAnalysisViewProps> = ({ analysis, imageUrl }) => {
   return (
     <div className="space-y-6">
       
+      {/* Uploaded Image Preview */}
+      {imageUrl && (
+        <div className="glass-panel rounded-2xl p-4 shadow-sm border border-slate-100/50 mb-6">
+           <div className="flex items-center gap-2 mb-3 px-2">
+              <ImageIcon className="w-5 h-5 text-violet-600" />
+              <h3 className="font-heading font-bold text-slate-800">Your Space</h3>
+           </div>
+           <div className="rounded-xl overflow-hidden border-2 border-white shadow-md relative aspect-video bg-slate-100">
+             <img 
+               src={imageUrl} 
+               alt="Uploaded Room" 
+               className="w-full h-full object-cover" 
+             />
+             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60"></div>
+             <div className="absolute bottom-4 left-4 text-white">
+                <span className="text-xs font-bold uppercase tracking-wider bg-black/30 backdrop-blur-md px-2 py-1 rounded-md border border-white/20">
+                  Analysis Source
+                </span>
+             </div>
+           </div>
+        </div>
+      )}
+
       {/* Basic Room Analysis */}
       <div className="glass-panel rounded-2xl p-6 shadow-sm border border-slate-100/50">
         <h2 className="text-lg font-heading font-bold text-slate-800 mb-5 flex items-center gap-2 border-b border-slate-100 pb-2">

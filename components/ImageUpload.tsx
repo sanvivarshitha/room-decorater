@@ -1,24 +1,29 @@
-import React, { useCallback } from 'react';
-import { Upload, Image as ImageIcon } from 'lucide-react';
+
+import React, { useCallback, useState } from 'react';
+import { Upload, Image as ImageIcon, ArrowRight, RotateCcw } from 'lucide-react';
 
 interface ImageUploadProps {
   onImageSelected: (base64: string, preview: string) => void;
 }
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected }) => {
+  const [preview, setPreview] = useState<string | null>(null);
+  const [base64, setBase64] = useState<string | null>(null);
+
   const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       processFile(file);
     }
-  }, [onImageSelected]);
+  }, []);
 
   const processFile = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const result = reader.result as string;
-      const base64 = result.split(',')[1];
-      onImageSelected(base64, result);
+      const b64 = result.split(',')[1];
+      setPreview(result);
+      setBase64(b64);
     };
     reader.readAsDataURL(file);
   };
@@ -30,6 +35,56 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected }) => 
       processFile(file);
     }
   };
+
+  const handleConfirm = () => {
+    if (base64 && preview) {
+      onImageSelected(base64, preview);
+    }
+  };
+
+  const handleClear = () => {
+    setPreview(null);
+    setBase64(null);
+  };
+
+  if (preview) {
+    return (
+      <div className="w-full max-w-xl mx-auto animate-fade-in">
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100 group">
+          <img src={preview} alt="Room Preview" className="w-full h-80 object-cover" />
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+             <button 
+               onClick={handleClear}
+               className="bg-white/20 backdrop-blur-md text-white p-3 rounded-full hover:bg-white/40 transition-colors border border-white/50"
+               title="Change Image"
+             >
+               <RotateCcw className="w-6 h-6" />
+             </button>
+          </div>
+          <div className="absolute bottom-4 left-4 right-4 text-center">
+            <span className="inline-block px-3 py-1 bg-black/60 backdrop-blur-md text-white text-xs font-bold rounded-full border border-white/20">
+              Preview Mode
+            </span>
+          </div>
+        </div>
+        
+        <div className="mt-8 flex justify-center gap-4">
+          <button 
+             onClick={handleClear}
+             className="px-6 py-3 rounded-xl font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+          >
+            Change Photo
+          </button>
+          <button 
+             onClick={handleConfirm}
+             className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center gap-2"
+          >
+            Next Step <ArrowRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 

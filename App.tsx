@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ImageUpload } from './components/ImageUpload';
 import { RoomAnalysisView } from './components/RoomAnalysisView';
-import { ThemeDetails } from './components/ThemeDetails';
+import { ThemeDetails, ThemeSection } from './components/ThemeDetails';
 import { EventSelection } from './components/EventSelection';
 import { BudgetSelection } from './components/BudgetSelection';
 import { Login } from './components/Login';
@@ -13,7 +13,19 @@ import { HelpDeskView } from './components/HelpDeskView';
 import { analyzeRoomImage, generateDecoratedRoomVariations } from './services/geminiService';
 import { saveHistoryItem, getHistory, deleteHistoryItem, clearHistory } from './services/historyService';
 import { AnalysisResult, AppState, UserPreferences, UserProfile, HistoryItem, UserSettings } from './types';
-import { Sparkles, RotateCcw, LogOut, History, Settings as SettingsIcon, HelpCircle } from 'lucide-react';
+import { Sparkles, RotateCcw, LogOut, History, Settings as SettingsIcon, HelpCircle, ChevronRight, ChevronLeft, CheckCircle2 } from 'lucide-react';
+
+// Define the logical steps for the Result Wizard
+const WIZARD_STEPS = [
+  { id: 'ROOM_ANALYSIS', title: 'Room Analysis' },
+  { id: 'THEME_SELECTION', title: 'Select Theme' },
+  { id: 'VISUALIZE', title: 'Visualization' },
+  { id: 'DESIGN', title: 'Design Plan' },
+  { id: 'EXECUTION', title: 'Setup Guide' },
+  { id: 'AMBIENCE', title: 'Ambience' },
+  { id: 'SHOPPING', title: 'Shopping List' },
+  { id: 'CLEANUP', title: 'Cleanup' },
+];
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>('LOGIN');
@@ -36,6 +48,9 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  
+  // Wizard State
+  const [currentWizardStep, setCurrentWizardStep] = useState(0);
 
   // Load history on mount
   useEffect(() => {
@@ -86,6 +101,9 @@ const App: React.FC = () => {
       setAnalysisResult(result);
       // Auto-select the recommended theme
       setSelectedThemeId(result.recommendedThemeId);
+      
+      // Start at Step 0 (Room Analysis)
+      setCurrentWizardStep(0);
       
       // SAVE TO HISTORY (if autoSave is enabled)
       if (settings.autoSave && updatedPrefs.imageBase64 && updatedPrefs.imagePreview) {
@@ -152,6 +170,7 @@ const App: React.FC = () => {
     });
     setAnalysisResult(null);
     setSelectedThemeId(null);
+    setCurrentWizardStep(0);
   };
 
   const handleBackToUpload = () => {
@@ -177,6 +196,7 @@ const App: React.FC = () => {
     });
     setAnalysisResult(item.analysisResult);
     setSelectedThemeId(item.analysisResult.recommendedThemeId);
+    setCurrentWizardStep(0);
     setAppState('RESULTS');
   };
 
@@ -216,17 +236,38 @@ const App: React.FC = () => {
     setHistoryItems([]);
   };
 
+  // Wizard Navigation
+  const nextStep = () => {
+    if (currentWizardStep < WIZARD_STEPS.length - 1) {
+      setCurrentWizardStep(curr => curr + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const prevStep = () => {
+    if (currentWizardStep > 0) {
+      setCurrentWizardStep(curr => curr - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const goToStep = (index: number) => {
+    // Prevent jumping ahead of theme selection if no theme is selected (logic mostly handled by disabled states)
+    setCurrentWizardStep(index);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen pb-20 relative overflow-x-hidden selection:bg-violet-200 selection:text-violet-900">
       
-      {/* Background Blobs for Visual Interest */}
+      {/* Background Blobs */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-200/40 rounded-full blur-3xl opacity-50 animate-pulse"></div>
         <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] bg-indigo-200/40 rounded-full blur-3xl opacity-50"></div>
         <div className="absolute bottom-[-10%] left-[20%] w-[35%] h-[35%] bg-pink-200/40 rounded-full blur-3xl opacity-50"></div>
       </div>
 
-      {/* Glass Navbar */}
+      {/* Navbar */}
       <nav className="glass-nav sticky top-0 z-50 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20">
@@ -259,47 +300,25 @@ const App: React.FC = () => {
                 <>
                   <button
                     onClick={handleOpenHistory}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
-                      appState === 'HISTORY' 
-                        ? 'bg-slate-900 text-white shadow-lg' 
-                        : 'text-slate-600 hover:text-white hover:bg-slate-900'
-                    }`}
+                    className="p-2 text-slate-400 hover:text-slate-900 transition-colors"
                     title="History"
                   >
-                    <History className="w-4 h-4" />
-                    <span className="hidden sm:inline">History</span>
+                    <History className="w-5 h-5" />
                   </button>
-
                   <button 
                      onClick={handleOpenHelp}
-                     className={`p-2 rounded-full transition-colors ${
-                       appState === 'HELP' ? 'text-slate-900 bg-slate-200' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'
-                     }`}
-                     title="Help Desk"
+                     className="p-2 text-slate-400 hover:text-slate-900 transition-colors"
+                     title="Help"
                    >
                      <HelpCircle className="w-5 h-5" />
                    </button>
-
                   <button 
                      onClick={handleOpenSettings}
-                     className={`p-2 rounded-full transition-colors ${
-                       appState === 'SETTINGS' ? 'text-slate-900 bg-slate-200' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'
-                     }`}
+                     className="p-2 text-slate-400 hover:text-slate-900 transition-colors"
                      title="Settings"
                    >
                      <SettingsIcon className="w-5 h-5" />
                    </button>
-
-                  {appState !== 'UPLOAD' && appState !== 'EVENT_SELECTION' && appState !== 'BUDGET_SELECTION' && appState !== 'HISTORY' && appState !== 'SETTINGS' && appState !== 'HELP' && (
-                    <button 
-                      onClick={handleReset}
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-white hover:bg-slate-900 rounded-full transition-all duration-300"
-                    >
-                      <RotateCcw className="w-4 h-4" />
-                      <span className="hidden sm:inline">New Project</span>
-                    </button>
-                  )}
-
                    <button 
                      onClick={handleLogout}
                      className="p-2 text-slate-400 hover:text-red-500 transition-colors"
@@ -316,12 +335,10 @@ const App: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         
-        {/* Step 0: Login */}
-        {appState === 'LOGIN' && (
-          <Login onLogin={handleLogin} />
-        )}
+        {/* LOGIN */}
+        {appState === 'LOGIN' && <Login onLogin={handleLogin} />}
 
-        {/* Step 1: Upload */}
+        {/* UPLOAD */}
         {appState === 'UPLOAD' && (
           <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
             <div className="text-center mb-12 max-w-3xl">
@@ -334,51 +351,16 @@ const App: React.FC = () => {
                   Instantly with AI
                 </span>
               </h2>
-              <p className="text-xl text-slate-600 font-light max-w-2xl mx-auto">
-                Upload a photo of your room. We'll generate stunning decoration themes, 
-                curated shopping lists, and budget estimates in seconds.
-              </p>
-            </div>
-            
-            <ImageUpload onImageSelected={handleImageSelected} />
-            
-            <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center w-full max-w-5xl">
-              <div className="glass-panel p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-indigo-600 font-bold text-lg shadow-sm">1</div>
-                <h3 className="font-heading font-bold text-lg text-slate-800">Upload Photo</h3>
-                <p className="text-sm text-slate-500 mt-2 leading-relaxed">Simply drag & drop a clear picture of the room you want to style.</p>
-              </div>
-              <div className="glass-panel p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="w-12 h-12 bg-fuchsia-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-fuchsia-600 font-bold text-lg shadow-sm">2</div>
-                <h3 className="font-heading font-bold text-lg text-slate-800">Choose Vibe</h3>
-                <p className="text-sm text-slate-500 mt-2 leading-relaxed">Tell us about the event—birthday, date night, or festival.</p>
-              </div>
-              <div className="glass-panel p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-600 font-bold text-lg shadow-sm">3</div>
-                <h3 className="font-heading font-bold text-lg text-slate-800">Get The Look</h3>
-                <p className="text-sm text-slate-500 mt-2 leading-relaxed">Receive a complete shopping list and visualization within your budget.</p>
-              </div>
+              <ImageUpload onImageSelected={handleImageSelected} />
             </div>
           </div>
         )}
 
-        {/* Step 2: Event Selection */}
-        {appState === 'EVENT_SELECTION' && (
-          <EventSelection 
-            onSelect={handleEventSelected} 
-            onBack={handleBackToUpload} 
-          />
-        )}
+        {/* SELECTION SCREENS */}
+        {appState === 'EVENT_SELECTION' && <EventSelection onSelect={handleEventSelected} onBack={handleBackToUpload} />}
+        {appState === 'BUDGET_SELECTION' && <BudgetSelection onSelect={handleBudgetSelected} onBack={handleBackToEvent} />}
 
-        {/* Step 3: Budget Selection */}
-        {appState === 'BUDGET_SELECTION' && (
-          <BudgetSelection 
-            onSelect={handleBudgetSelected} 
-            onBack={handleBackToEvent} 
-          />
-        )}
-
-        {/* State: ANALYZING */}
+        {/* ANALYZING */}
         {appState === 'ANALYZING' && (
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
             <div className="relative w-32 h-32 mb-8">
@@ -390,148 +372,158 @@ const App: React.FC = () => {
               </div>
             </div>
             <h3 className="text-3xl font-heading font-bold text-slate-900 mb-3">Dreaming up ideas...</h3>
-            <p className="text-slate-500 text-lg">Curating <span className="text-violet-600 font-semibold">{prefs.eventType}</span> themes for your budget.</p>
+            <p className="text-slate-500 text-lg">Curating themes for your budget.</p>
           </div>
         )}
 
-        {/* State: HISTORY */}
-        {appState === 'HISTORY' && (
-          <HistoryView 
-            historyItems={historyItems}
-            onSelect={handleRestoreHistoryItem}
-            onDelete={handleDeleteHistoryItem}
-            onBack={handleCloseSubView}
-          />
-        )}
-
-        {/* State: SETTINGS */}
-        {appState === 'SETTINGS' && user && (
-          <SettingsView
-            user={user}
-            settings={settings}
-            onUpdateProfile={handleUpdateProfile}
-            onUpdateSettings={handleUpdateSettings}
-            onClearHistory={handleClearHistory}
-            onLogout={handleLogout}
-            onBack={handleCloseSubView}
-          />
-        )}
-
-        {/* State: HELP */}
-        {appState === 'HELP' && (
-          <HelpDeskView onBack={handleCloseSubView} />
-        )}
-
-        {/* State: ERROR */}
+        {/* SUB-VIEWS */}
+        {appState === 'HISTORY' && <HistoryView historyItems={historyItems} onSelect={handleRestoreHistoryItem} onDelete={handleDeleteHistoryItem} onBack={handleCloseSubView} />}
+        {appState === 'SETTINGS' && user && <SettingsView user={user} settings={settings} onUpdateProfile={handleUpdateProfile} onUpdateSettings={handleUpdateSettings} onClearHistory={handleClearHistory} onLogout={handleLogout} onBack={handleCloseSubView} />}
+        {appState === 'HELP' && <HelpDeskView onBack={handleCloseSubView} />}
         {appState === 'ERROR' && (
           <div className="flex flex-col items-center justify-center min-h-[50vh]">
-            <div className="bg-white p-8 rounded-2xl shadow-xl border border-red-100 text-center max-w-md">
-              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <RotateCcw className="w-8 h-8 text-red-500" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Connection Interrupted</h3>
-              <p className="text-slate-600 mb-6">{error}</p>
-              <button 
-                onClick={handleReset}
-                className="bg-slate-900 text-white px-6 py-3 rounded-xl font-medium hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl"
-              >
-                Try Again
-              </button>
-            </div>
+            <p className="text-red-500 mb-4">{error}</p>
+            <button onClick={handleReset} className="bg-slate-900 text-white px-6 py-2 rounded-lg">Try Again</button>
           </div>
         )}
 
-        {/* State: RESULTS */}
+        {/* RESULTS WIZARD */}
         {appState === 'RESULTS' && analysisResult && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in-up">
+          <div className="animate-fade-in-up pb-24">
             
-            {/* Sidebar / Top Section for Mobile */}
-            <div className="lg:col-span-4 space-y-6">
-              {/* Image Preview Card */}
-              <div className="glass-panel p-4 rounded-2xl shadow-sm">
-                 <div className="flex items-center justify-between mb-3 px-1">
-                    <h3 className="font-heading font-bold text-slate-800">Your Space</h3>
-                    <div className="flex gap-2">
-                       <span className="text-xs font-bold px-2 py-1 bg-violet-100 text-violet-700 rounded-md uppercase tracking-wide">{prefs.eventType}</span>
-                    </div>
-                 </div>
-                 {prefs.imagePreview && (
-                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 shadow-inner group">
-                    <img src={prefs.imagePreview} alt="Room Preview" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-60"></div>
-                  </div>
-                 )}
-                 <div className="mt-4 px-1">
-                    <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Budget Target</p>
-                    <p className="text-lg font-heading font-semibold text-slate-800">{prefs.budget}</p>
-                 </div>
-              </div>
-
-              {/* Room Analysis */}
-              <RoomAnalysisView analysis={analysisResult.roomAnalysis} />
-
-              {/* Theme Navigation */}
-              <div className="glass-panel rounded-2xl shadow-sm overflow-hidden">
-                <div className="p-5 border-b border-slate-100 bg-white/50">
-                  <h3 className="font-heading font-bold text-slate-800 text-lg">Curated Collections</h3>
-                </div>
-                <div className="max-h-[500px] overflow-y-auto p-2 space-y-2">
-                  {analysisResult.themes.map((theme) => {
-                    const isSelected = selectedThemeId === theme.id;
-                    const isRec = analysisResult.recommendedThemeId === theme.id;
-                    return (
-                      <button
-                        key={theme.id}
-                        onClick={() => setSelectedThemeId(theme.id)}
-                        className={`w-full text-left p-4 rounded-xl transition-all duration-300 relative overflow-hidden group ${
-                          isSelected 
-                            ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20 transform scale-[1.02]' 
-                            : 'hover:bg-white hover:shadow-md text-slate-600 bg-transparent'
-                        }`}
-                      >
-                        <div className="relative z-10">
-                          <div className="flex justify-between items-start mb-1">
-                            <h4 className={`font-bold font-heading text-lg ${isSelected ? 'text-white' : 'text-slate-800'}`}>
-                              {theme.name}
-                            </h4>
-                            {isRec && (
-                              <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                                isSelected ? 'bg-amber-400 text-slate-900' : 'bg-amber-100 text-amber-700'
-                              }`}>
-                                <Sparkles className="w-3 h-3" /> Best
-                              </span>
-                            )}
-                          </div>
-                          
-                          <div className={`flex items-center gap-3 text-sm mt-2 ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
-                             <span>{theme.items.length} Items</span>
-                             <span className="opacity-50">•</span>
-                             <span className={`font-medium ${isSelected ? 'text-emerald-300' : 'text-slate-700'}`}>₹{theme.totalCost.toLocaleString('en-IN')}</span>
-                          </div>
+            {/* Wizard Stepper */}
+            <div className="flex justify-center mb-8 overflow-x-auto pb-4">
+               <div className="flex items-center gap-1 bg-white/50 backdrop-blur-md p-2 rounded-full border border-slate-200 shadow-sm">
+                  {WIZARD_STEPS.map((step, idx) => {
+                     const isActive = idx === currentWizardStep;
+                     const isCompleted = idx < currentWizardStep;
+                     return (
+                        <div key={step.id} className="flex items-center">
+                           <button 
+                              onClick={() => goToStep(idx)}
+                              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all whitespace-nowrap ${
+                                 isActive ? 'bg-slate-900 text-white font-bold shadow-md' : 
+                                 isCompleted ? 'bg-violet-100 text-violet-700 hover:bg-violet-200' : 
+                                 'text-slate-400 hover:text-slate-600'
+                              }`}
+                           >
+                              {isCompleted && <CheckCircle2 className="w-4 h-4" />}
+                              <span className="text-xs md:text-sm font-medium">{step.title}</span>
+                           </button>
+                           {idx < WIZARD_STEPS.length - 1 && (
+                              <div className={`w-8 h-[1px] mx-1 ${isCompleted ? 'bg-violet-200' : 'bg-slate-200'}`}></div>
+                           )}
                         </div>
-                      </button>
-                    );
+                     );
                   })}
-                </div>
-              </div>
+               </div>
             </div>
 
-            {/* Main Content Area */}
-            <div className="lg:col-span-8">
-              {selectedThemeId && analysisResult.themes.find(t => t.id === selectedThemeId) && (
-                <ThemeDetails 
-                  theme={analysisResult.themes.find(t => t.id === selectedThemeId)!} 
-                  isRecommended={analysisResult.recommendedThemeId === selectedThemeId}
-                  recommendationReason={
-                    analysisResult.recommendedThemeId === selectedThemeId 
-                    ? analysisResult.recommendationReason 
-                    : undefined
-                  }
-                  onGenerateImage={handleGeneratePreview}
-                  isGeneratingImage={isGeneratingImage}
-                  originalImagePreview={prefs.imagePreview}
-                />
-              )}
+            {/* Step Content */}
+            <div className="min-h-[500px]">
+               {/* 1. ROOM ANALYSIS */}
+               {WIZARD_STEPS[currentWizardStep].id === 'ROOM_ANALYSIS' && (
+                  <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+                     <div className="text-center mb-6">
+                        <h2 className="text-3xl font-heading font-bold text-slate-900">Room Analysis</h2>
+                        <p className="text-slate-500">What our AI sees in your space.</p>
+                     </div>
+                     <RoomAnalysisView analysis={analysisResult.roomAnalysis} imageUrl={prefs.imagePreview} />
+                  </div>
+               )}
+
+               {/* 2. THEME SELECTION CARD GRID */}
+               {WIZARD_STEPS[currentWizardStep].id === 'THEME_SELECTION' && (
+                  <div className="max-w-6xl mx-auto animate-fade-in">
+                     <div className="text-center mb-8">
+                        <h2 className="text-3xl font-heading font-bold text-slate-900">Select Your Theme</h2>
+                        <p className="text-slate-500">We curated {analysisResult.themes.length} styles for your event.</p>
+                     </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {analysisResult.themes.map((theme) => {
+                           const isSelected = selectedThemeId === theme.id;
+                           const isRec = analysisResult.recommendedThemeId === theme.id;
+                           return (
+                              <div 
+                                 key={theme.id}
+                                 onClick={() => setSelectedThemeId(theme.id)}
+                                 className={`cursor-pointer rounded-3xl p-6 transition-all duration-300 border-2 relative overflow-hidden group hover:-translate-y-1 ${
+                                    isSelected 
+                                    ? 'bg-slate-900 border-slate-900 shadow-xl' 
+                                    : 'bg-white border-transparent hover:border-violet-200 shadow-md hover:shadow-lg'
+                                 }`}
+                              >
+                                 {isRec && (
+                                    <div className="absolute top-4 right-4 bg-amber-400 text-slate-900 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                       <Sparkles className="w-3 h-3" /> Best Match
+                                    </div>
+                                 )}
+                                 <h3 className={`text-2xl font-heading font-bold mb-2 ${isSelected ? 'text-white' : 'text-slate-900'}`}>{theme.name}</h3>
+                                 <p className={`text-sm mb-4 italic ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>{theme.mood}</p>
+                                 
+                                 <div className="flex gap-2 mb-6">
+                                    {(theme.paletteDetails?.colors || theme.colorPalette.slice(0,3)).map((c, i) => (
+                                       <div 
+                                          key={i} 
+                                          className="w-8 h-8 rounded-full border-2 border-white shadow-sm" 
+                                          style={{ backgroundColor: typeof c === 'string' ? c : c.hex }}
+                                       ></div>
+                                    ))}
+                                 </div>
+
+                                 <div className={`flex justify-between items-center border-t pt-4 ${isSelected ? 'border-slate-700' : 'border-slate-100'}`}>
+                                    <span className={`text-lg font-bold ${isSelected ? 'text-emerald-400' : 'text-slate-900'}`}>₹{theme.totalCost.toLocaleString()}</span>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isSelected ? 'bg-white text-slate-900' : 'bg-slate-100 text-slate-400'}`}>
+                                       {isSelected ? <CheckCircle2 className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                                    </div>
+                                 </div>
+                              </div>
+                           );
+                        })}
+                     </div>
+                  </div>
+               )}
+
+               {/* 3-8. THEME DETAILS SECTIONS */}
+               {currentWizardStep > 1 && selectedThemeId && analysisResult.themes.find(t => t.id === selectedThemeId) && (
+                  <ThemeDetails 
+                     theme={analysisResult.themes.find(t => t.id === selectedThemeId)!} 
+                     isRecommended={analysisResult.recommendedThemeId === selectedThemeId}
+                     recommendationReason={analysisResult.recommendedThemeId === selectedThemeId ? analysisResult.recommendationReason : undefined}
+                     onGenerateImage={handleGeneratePreview}
+                     isGeneratingImage={isGeneratingImage}
+                     originalImagePreview={prefs.imagePreview}
+                     activeSection={WIZARD_STEPS[currentWizardStep].id as ThemeSection}
+                  />
+               )}
+            </div>
+
+            {/* Bottom Navigation Bar */}
+            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-white/90 backdrop-blur-md p-2 rounded-full shadow-2xl border border-slate-200 z-40">
+               <button 
+                  onClick={prevStep}
+                  disabled={currentWizardStep === 0}
+                  className="w-12 h-12 rounded-full flex items-center justify-center bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+               >
+                  <ChevronLeft className="w-6 h-6" />
+               </button>
+               
+               <div className="px-4 text-center">
+                  <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Step {currentWizardStep + 1} of {WIZARD_STEPS.length}</span>
+                  <span className="block text-sm font-bold text-slate-900">{WIZARD_STEPS[currentWizardStep].title}</span>
+               </div>
+
+               <button 
+                  onClick={nextStep}
+                  disabled={currentWizardStep === WIZARD_STEPS.length - 1 || (WIZARD_STEPS[currentWizardStep].id === 'THEME_SELECTION' && !selectedThemeId)}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${
+                     currentWizardStep === WIZARD_STEPS.length - 1 
+                     ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
+                     : 'bg-slate-900 text-white hover:bg-violet-600 hover:scale-105'
+                  }`}
+               >
+                  <ChevronRight className="w-6 h-6" />
+               </button>
             </div>
 
           </div>
