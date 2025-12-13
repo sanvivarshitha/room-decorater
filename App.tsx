@@ -30,6 +30,8 @@ const WIZARD_STEPS = [
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>('LOGIN');
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [currentLanguage, setCurrentLanguage] = useState('en');
+
   const [settings, setSettings] = useState<UserSettings>({
     currency: 'INR',
     enableNotifications: true,
@@ -58,8 +60,9 @@ const App: React.FC = () => {
   }, []);
 
   // Step 0: Login
-  const handleLogin = (profile: UserProfile) => {
+  const handleLogin = (profile: UserProfile, language: string) => {
     setUser(profile);
+    setCurrentLanguage(language);
     setAppState('UPLOAD');
   };
 
@@ -95,7 +98,8 @@ const App: React.FC = () => {
       const result = await analyzeRoomImage(
         updatedPrefs.imageBase64,
         updatedPrefs.eventType,
-        updatedPrefs.budget
+        updatedPrefs.budget,
+        currentLanguage // Pass the selected language here
       );
       
       setAnalysisResult(result);
@@ -258,13 +262,13 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pb-20 relative overflow-x-hidden selection:bg-violet-200 selection:text-violet-900">
+    <div className="min-h-screen pb-20 relative overflow-x-hidden selection:bg-violet-500 selection:text-white">
       
-      {/* Background Blobs */}
+      {/* Background Blobs - Dark & Vibrant */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-200/40 rounded-full blur-3xl opacity-50 animate-pulse"></div>
-        <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] bg-indigo-200/40 rounded-full blur-3xl opacity-50"></div>
-        <div className="absolute bottom-[-10%] left-[20%] w-[35%] h-[35%] bg-pink-200/40 rounded-full blur-3xl opacity-50"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-900/30 rounded-full blur-[100px] opacity-40 animate-pulse"></div>
+        <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] bg-indigo-900/30 rounded-full blur-[100px] opacity-40"></div>
+        <div className="absolute bottom-[-10%] left-[20%] w-[35%] h-[35%] bg-fuchsia-900/30 rounded-full blur-[100px] opacity-40"></div>
       </div>
 
       {/* Navbar */}
@@ -272,26 +276,26 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => user && handleReset()}>
-              <div className="bg-gradient-to-tr from-violet-600 to-fuchsia-600 p-2.5 rounded-xl shadow-lg shadow-violet-500/20">
+              <div className="bg-gradient-to-tr from-violet-600 to-fuchsia-600 p-2.5 rounded-xl shadow-lg shadow-violet-900/40">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-heading font-bold text-slate-900 tracking-tight leading-none">
-                  Lumina<span className="text-violet-600">Decor</span>
+                <h1 className="text-2xl font-heading font-bold text-white tracking-tight leading-none">
+                  Lumina<span className="text-violet-400">Decor</span>
                 </h1>
-                <p className="text-xs text-slate-500 font-medium tracking-wide">AI INTERIOR STYLIST</p>
+                <p className="text-xs text-slate-400 font-medium tracking-wide">AI INTERIOR STYLIST</p>
               </div>
             </div>
             
             <div className="flex items-center gap-4">
               {user && (
-                <div className="hidden md:flex items-center gap-3 bg-white/50 pl-2 pr-4 py-1.5 rounded-full border border-slate-200/50 shadow-sm">
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                <div className="hidden md:flex items-center gap-3 bg-slate-800/50 pl-2 pr-4 py-1.5 rounded-full border border-white/10 shadow-sm">
+                  <div className="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center text-xs font-bold shadow-sm ring-2 ring-violet-500/20">
                     {user.avatarInitials}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-800 leading-tight">{user.name}</span>
-                    <span className="text-[10px] text-slate-500 leading-tight">{user.role}</span>
+                    <span className="text-xs font-bold text-slate-200 leading-tight">{user.name}</span>
+                    <span className="text-[10px] text-slate-400 leading-tight">{user.role}</span>
                   </div>
                 </div>
               )}
@@ -300,28 +304,28 @@ const App: React.FC = () => {
                 <>
                   <button
                     onClick={handleOpenHistory}
-                    className="p-2 text-slate-400 hover:text-slate-900 transition-colors"
+                    className="p-2 text-slate-400 hover:text-white transition-colors hover:bg-white/5 rounded-full"
                     title="History"
                   >
                     <History className="w-5 h-5" />
                   </button>
                   <button 
                      onClick={handleOpenHelp}
-                     className="p-2 text-slate-400 hover:text-slate-900 transition-colors"
+                     className="p-2 text-slate-400 hover:text-white transition-colors hover:bg-white/5 rounded-full"
                      title="Help"
                    >
                      <HelpCircle className="w-5 h-5" />
                    </button>
                   <button 
                      onClick={handleOpenSettings}
-                     className="p-2 text-slate-400 hover:text-slate-900 transition-colors"
+                     className="p-2 text-slate-400 hover:text-white transition-colors hover:bg-white/5 rounded-full"
                      title="Settings"
                    >
                      <SettingsIcon className="w-5 h-5" />
                    </button>
                    <button 
                      onClick={handleLogout}
-                     className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                     className="p-2 text-slate-400 hover:text-red-400 transition-colors hover:bg-red-500/10 rounded-full"
                      title="Logout"
                    >
                      <LogOut className="w-5 h-5" />
@@ -342,12 +346,12 @@ const App: React.FC = () => {
         {appState === 'UPLOAD' && (
           <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
             <div className="text-center mb-12 max-w-3xl">
-              <span className="inline-block px-4 py-1.5 rounded-full bg-violet-100 text-violet-700 text-xs font-bold uppercase tracking-wider mb-4 border border-violet-200 shadow-sm">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-violet-900/30 text-violet-300 text-xs font-bold uppercase tracking-wider mb-4 border border-violet-500/30 shadow-lg shadow-violet-500/10">
                 Welcome back, {user?.name.split(' ')[0]}
               </span>
-              <h2 className="text-5xl md:text-6xl font-heading font-bold text-slate-900 mb-6 leading-tight">
+              <h2 className="text-5xl md:text-6xl font-heading font-bold text-white mb-6 leading-tight">
                 Reimagine Your Space <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">
                   Instantly with AI
                 </span>
               </h2>
@@ -364,15 +368,15 @@ const App: React.FC = () => {
         {appState === 'ANALYZING' && (
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
             <div className="relative w-32 h-32 mb-8">
-              <div className="absolute inset-0 bg-violet-100 rounded-full animate-ping opacity-20"></div>
-              <div className="absolute inset-0 border-4 border-slate-100 rounded-full"></div>
-              <div className="absolute inset-0 border-4 border-violet-600 rounded-full border-t-transparent animate-spin"></div>
+              <div className="absolute inset-0 bg-violet-500 rounded-full animate-ping opacity-20"></div>
+              <div className="absolute inset-0 border-4 border-slate-700 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-violet-500 rounded-full border-t-transparent animate-spin"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                 <Sparkles className="w-10 h-10 text-violet-600 animate-pulse" />
+                 <Sparkles className="w-10 h-10 text-violet-400 animate-pulse" />
               </div>
             </div>
-            <h3 className="text-3xl font-heading font-bold text-slate-900 mb-3">Dreaming up ideas...</h3>
-            <p className="text-slate-500 text-lg">Curating themes for your budget.</p>
+            <h3 className="text-3xl font-heading font-bold text-white mb-3">Dreaming up ideas...</h3>
+            <p className="text-slate-400 text-lg">Curating themes for your budget.</p>
           </div>
         )}
 
@@ -382,8 +386,8 @@ const App: React.FC = () => {
         {appState === 'HELP' && <HelpDeskView onBack={handleCloseSubView} />}
         {appState === 'ERROR' && (
           <div className="flex flex-col items-center justify-center min-h-[50vh]">
-            <p className="text-red-500 mb-4">{error}</p>
-            <button onClick={handleReset} className="bg-slate-900 text-white px-6 py-2 rounded-lg">Try Again</button>
+            <p className="text-red-400 mb-4">{error}</p>
+            <button onClick={handleReset} className="bg-white text-slate-900 px-6 py-2 rounded-lg font-bold">Try Again</button>
           </div>
         )}
 
@@ -393,7 +397,7 @@ const App: React.FC = () => {
             
             {/* Wizard Stepper */}
             <div className="flex justify-center mb-8 overflow-x-auto pb-4">
-               <div className="flex items-center gap-1 bg-white/50 backdrop-blur-md p-2 rounded-full border border-slate-200 shadow-sm">
+               <div className="flex items-center gap-1 bg-slate-900/60 backdrop-blur-md p-2 rounded-full border border-white/10 shadow-lg">
                   {WIZARD_STEPS.map((step, idx) => {
                      const isActive = idx === currentWizardStep;
                      const isCompleted = idx < currentWizardStep;
@@ -402,16 +406,16 @@ const App: React.FC = () => {
                            <button 
                               onClick={() => goToStep(idx)}
                               className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all whitespace-nowrap ${
-                                 isActive ? 'bg-slate-900 text-white font-bold shadow-md' : 
-                                 isCompleted ? 'bg-violet-100 text-violet-700 hover:bg-violet-200' : 
-                                 'text-slate-400 hover:text-slate-600'
+                                 isActive ? 'bg-violet-600 text-white font-bold shadow-md shadow-violet-900/50' : 
+                                 isCompleted ? 'bg-violet-900/20 text-violet-300 hover:bg-violet-900/40' : 
+                                 'text-slate-500 hover:text-slate-300'
                               }`}
                            >
                               {isCompleted && <CheckCircle2 className="w-4 h-4" />}
                               <span className="text-xs md:text-sm font-medium">{step.title}</span>
                            </button>
                            {idx < WIZARD_STEPS.length - 1 && (
-                              <div className={`w-8 h-[1px] mx-1 ${isCompleted ? 'bg-violet-200' : 'bg-slate-200'}`}></div>
+                              <div className={`w-8 h-[1px] mx-1 ${isCompleted ? 'bg-violet-800' : 'bg-slate-800'}`}></div>
                            )}
                         </div>
                      );
@@ -425,8 +429,8 @@ const App: React.FC = () => {
                {WIZARD_STEPS[currentWizardStep].id === 'ROOM_ANALYSIS' && (
                   <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
                      <div className="text-center mb-6">
-                        <h2 className="text-3xl font-heading font-bold text-slate-900">Room Analysis</h2>
-                        <p className="text-slate-500">What our AI sees in your space.</p>
+                        <h2 className="text-3xl font-heading font-bold text-white">Room Analysis</h2>
+                        <p className="text-slate-400">What our AI sees in your space.</p>
                      </div>
                      <RoomAnalysisView analysis={analysisResult.roomAnalysis} imageUrl={prefs.imagePreview} />
                   </div>
@@ -436,8 +440,8 @@ const App: React.FC = () => {
                {WIZARD_STEPS[currentWizardStep].id === 'THEME_SELECTION' && (
                   <div className="max-w-6xl mx-auto animate-fade-in">
                      <div className="text-center mb-8">
-                        <h2 className="text-3xl font-heading font-bold text-slate-900">Select Your Theme</h2>
-                        <p className="text-slate-500">We curated {analysisResult.themes.length} styles for your event.</p>
+                        <h2 className="text-3xl font-heading font-bold text-white">Select Your Theme</h2>
+                        <p className="text-slate-400">We curated {analysisResult.themes.length} styles for your event.</p>
                      </div>
                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {analysisResult.themes.map((theme) => {
@@ -447,33 +451,33 @@ const App: React.FC = () => {
                               <div 
                                  key={theme.id}
                                  onClick={() => setSelectedThemeId(theme.id)}
-                                 className={`cursor-pointer rounded-3xl p-6 transition-all duration-300 border-2 relative overflow-hidden group hover:-translate-y-1 ${
+                                 className={`cursor-pointer rounded-3xl p-6 transition-all duration-300 border relative overflow-hidden group hover:-translate-y-1 ${
                                     isSelected 
-                                    ? 'bg-slate-900 border-slate-900 shadow-xl' 
-                                    : 'bg-white border-transparent hover:border-violet-200 shadow-md hover:shadow-lg'
+                                    ? 'bg-violet-900/20 border-violet-500 shadow-2xl shadow-violet-900/20' 
+                                    : 'glass-panel border-white/5 hover:border-violet-500/30 hover:bg-slate-800/60'
                                  }`}
                               >
                                  {isRec && (
-                                    <div className="absolute top-4 right-4 bg-amber-400 text-slate-900 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                    <div className="absolute top-4 right-4 bg-amber-500 text-slate-950 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
                                        <Sparkles className="w-3 h-3" /> Best Match
                                     </div>
                                  )}
-                                 <h3 className={`text-2xl font-heading font-bold mb-2 ${isSelected ? 'text-white' : 'text-slate-900'}`}>{theme.name}</h3>
-                                 <p className={`text-sm mb-4 italic ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>{theme.mood}</p>
+                                 <h3 className={`text-2xl font-heading font-bold mb-2 ${isSelected ? 'text-white' : 'text-slate-100'}`}>{theme.name}</h3>
+                                 <p className={`text-sm mb-4 italic ${isSelected ? 'text-violet-200' : 'text-slate-400'}`}>{theme.mood}</p>
                                  
                                  <div className="flex gap-2 mb-6">
                                     {(theme.paletteDetails?.colors || theme.colorPalette.slice(0,3)).map((c, i) => (
                                        <div 
                                           key={i} 
-                                          className="w-8 h-8 rounded-full border-2 border-white shadow-sm" 
+                                          className="w-8 h-8 rounded-full border-2 border-slate-700 shadow-sm" 
                                           style={{ backgroundColor: typeof c === 'string' ? c : c.hex }}
                                        ></div>
                                     ))}
                                  </div>
 
-                                 <div className={`flex justify-between items-center border-t pt-4 ${isSelected ? 'border-slate-700' : 'border-slate-100'}`}>
-                                    <span className={`text-lg font-bold ${isSelected ? 'text-emerald-400' : 'text-slate-900'}`}>₹{theme.totalCost.toLocaleString()}</span>
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isSelected ? 'bg-white text-slate-900' : 'bg-slate-100 text-slate-400'}`}>
+                                 <div className={`flex justify-between items-center border-t pt-4 ${isSelected ? 'border-violet-500/30' : 'border-white/10'}`}>
+                                    <span className={`text-lg font-bold ${isSelected ? 'text-violet-300' : 'text-white'}`}>₹{theme.totalCost.toLocaleString()}</span>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isSelected ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
                                        {isSelected ? <CheckCircle2 className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                                     </div>
                                  </div>
@@ -499,18 +503,18 @@ const App: React.FC = () => {
             </div>
 
             {/* Bottom Navigation Bar */}
-            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-white/90 backdrop-blur-md p-2 rounded-full shadow-2xl border border-slate-200 z-40">
+            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-slate-900/90 backdrop-blur-md p-2 rounded-full shadow-2xl border border-white/10 z-40">
                <button 
                   onClick={prevStep}
                   disabled={currentWizardStep === 0}
-                  className="w-12 h-12 rounded-full flex items-center justify-center bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-12 h-12 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                >
                   <ChevronLeft className="w-6 h-6" />
                </button>
                
                <div className="px-4 text-center">
-                  <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Step {currentWizardStep + 1} of {WIZARD_STEPS.length}</span>
-                  <span className="block text-sm font-bold text-slate-900">{WIZARD_STEPS[currentWizardStep].title}</span>
+                  <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Step {currentWizardStep + 1} of {WIZARD_STEPS.length}</span>
+                  <span className="block text-sm font-bold text-white">{WIZARD_STEPS[currentWizardStep].title}</span>
                </div>
 
                <button 
@@ -518,8 +522,8 @@ const App: React.FC = () => {
                   disabled={currentWizardStep === WIZARD_STEPS.length - 1 || (WIZARD_STEPS[currentWizardStep].id === 'THEME_SELECTION' && !selectedThemeId)}
                   className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${
                      currentWizardStep === WIZARD_STEPS.length - 1 
-                     ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
-                     : 'bg-slate-900 text-white hover:bg-violet-600 hover:scale-105'
+                     ? 'bg-slate-800 text-slate-600 cursor-not-allowed' 
+                     : 'bg-white text-slate-950 hover:bg-violet-400 hover:text-slate-950 hover:scale-105'
                   }`}
                >
                   <ChevronRight className="w-6 h-6" />

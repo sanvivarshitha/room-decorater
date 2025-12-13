@@ -56,15 +56,15 @@ export const HelpDeskView: React.FC<HelpDeskViewProps> = ({ onBack }) => {
     <div className="animate-fade-in w-full max-w-6xl mx-auto mb-20">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-3xl font-heading font-bold text-slate-900 flex items-center gap-3">
-            <LifeBuoy className="w-8 h-8 text-violet-600" />
+          <h2 className="text-3xl font-heading font-bold text-white flex items-center gap-3">
+            <LifeBuoy className="w-8 h-8 text-violet-400" />
             Help Desk
           </h2>
-          <p className="text-slate-500 mt-1">We're here to support your creative journey</p>
+          <p className="text-slate-400 mt-1">We're here to support your creative journey</p>
         </div>
         <button 
           onClick={onBack}
-          className="px-5 py-2 rounded-full border border-slate-200 text-slate-600 hover:bg-white hover:text-slate-900 transition-colors font-medium text-sm"
+          className="px-5 py-2 rounded-full border border-slate-700 text-slate-400 hover:bg-white hover:text-slate-900 transition-colors font-medium text-sm"
         >
           Close
         </button>
@@ -74,9 +74,9 @@ export const HelpDeskView: React.FC<HelpDeskViewProps> = ({ onBack }) => {
         
         {/* Left Column: FAQs */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="glass-panel p-8 rounded-2xl shadow-sm">
-            <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-violet-600" />
+          <div className="glass-panel p-8 rounded-2xl shadow-sm border border-white/10">
+            <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-violet-400" />
               Frequently Asked Questions
             </h3>
             
@@ -84,17 +84,17 @@ export const HelpDeskView: React.FC<HelpDeskViewProps> = ({ onBack }) => {
               {faqs.map((faq, index) => (
                 <div 
                   key={index} 
-                  className={`border border-slate-100 rounded-xl overflow-hidden transition-all duration-300 ${openFaqIndex === index ? 'bg-violet-50/50 border-violet-100' : 'bg-white/50'}`}
+                  className={`border border-white/5 rounded-xl overflow-hidden transition-all duration-300 ${openFaqIndex === index ? 'bg-violet-900/20 border-violet-500/30' : 'bg-slate-800/30'}`}
                 >
                   <button 
                     onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                    className="w-full flex items-center justify-between p-4 text-left font-medium text-slate-800"
+                    className="w-full flex items-center justify-between p-4 text-left font-medium text-slate-200"
                   >
                     {faq.question}
-                    {openFaqIndex === index ? <ChevronUp className="w-4 h-4 text-violet-600" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                    {openFaqIndex === index ? <ChevronUp className="w-4 h-4 text-violet-400" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
                   </button>
                   {openFaqIndex === index && (
-                    <div className="px-4 pb-4 pt-0 text-slate-600 text-sm leading-relaxed animate-fade-in">
+                    <div className="px-4 pb-4 pt-0 text-slate-400 text-sm leading-relaxed animate-fade-in">
                       {faq.answer}
                     </div>
                   )}
@@ -105,22 +105,22 @@ export const HelpDeskView: React.FC<HelpDeskViewProps> = ({ onBack }) => {
 
           {/* Quick Contact Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="glass-panel p-6 rounded-2xl flex items-center gap-4">
-                <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
+             <div className="glass-panel p-6 rounded-2xl flex items-center gap-4 border border-white/10">
+                <div className="p-3 bg-blue-900/30 text-blue-400 rounded-full border border-blue-500/30">
                   <Mail className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900">Email Support</h4>
-                  <p className="text-sm text-slate-500">support@luminadecor.ai</p>
+                  <h4 className="font-bold text-white">Email Support</h4>
+                  <p className="text-sm text-slate-400">support@luminadecor.ai</p>
                 </div>
              </div>
-             <div className="glass-panel p-6 rounded-2xl flex items-center gap-4">
-                <div className="p-3 bg-emerald-100 text-emerald-600 rounded-full">
+             <div className="glass-panel p-6 rounded-2xl flex items-center gap-4 border border-white/10">
+                <div className="p-3 bg-emerald-900/30 text-emerald-400 rounded-full border border-emerald-500/30">
                   <Phone className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900">Helpline (India)</h4>
-                  <p className="text-sm text-slate-500">+91 1800-DECOR-AI</p>
+                  <h4 className="font-bold text-white">Helpline (India)</h4>
+                  <p className="text-sm text-slate-400">+91 1800-DECOR-AI</p>
                 </div>
              </div>
           </div>
@@ -128,23 +128,23 @@ export const HelpDeskView: React.FC<HelpDeskViewProps> = ({ onBack }) => {
 
         {/* Right Column: Contact Form */}
         <div className="lg:col-span-1">
-          <div className="glass-panel p-8 rounded-2xl shadow-sm h-full relative overflow-hidden">
-            <h3 className="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-violet-600" />
+          <div className="glass-panel p-8 rounded-2xl shadow-sm h-full relative overflow-hidden border border-white/10">
+            <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+              <MessageCircle className="w-5 h-5 text-violet-400" />
               Submit a Ticket
             </h3>
-            <p className="text-sm text-slate-500 mb-6">Can't find what you're looking for? Write to us.</p>
+            <p className="text-sm text-slate-400 mb-6">Can't find what you're looking for? Write to us.</p>
 
             {ticketSent ? (
-              <div className="absolute inset-0 bg-white/90 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-center p-8 animate-fade-in">
-                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
+              <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-center p-8 animate-fade-in">
+                <div className="w-16 h-16 bg-green-900/30 text-green-400 rounded-full flex items-center justify-center mb-4 border border-green-500/30">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h4 className="text-xl font-bold text-slate-900 mb-2">Message Sent!</h4>
-                <p className="text-slate-600 mb-6">Our support team will get back to you within 24 hours.</p>
+                <h4 className="text-xl font-bold text-white mb-2">Message Sent!</h4>
+                <p className="text-slate-400 mb-6">Our support team will get back to you within 24 hours.</p>
                 <button 
                   onClick={() => setTicketSent(false)}
-                  className="text-violet-600 font-bold text-sm hover:underline"
+                  className="text-violet-400 font-bold text-sm hover:underline"
                 >
                   Send another message
                 </button>
@@ -152,8 +152,8 @@ export const HelpDeskView: React.FC<HelpDeskViewProps> = ({ onBack }) => {
             ) : (
               <form onSubmit={handleTicketSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Subject</label>
-                  <select className="w-full p-3 bg-white/50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none">
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Subject</label>
+                  <select className="w-full p-3 bg-slate-900/50 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none text-white">
                     <option>General Inquiry</option>
                     <option>Bug Report</option>
                     <option>Billing Issue</option>
@@ -162,19 +162,19 @@ export const HelpDeskView: React.FC<HelpDeskViewProps> = ({ onBack }) => {
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Message</label>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Message</label>
                   <textarea 
                     required
                     rows={5}
                     placeholder="Describe your issue in detail..."
-                    className="w-full p-3 bg-white/50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none resize-none"
+                    className="w-full p-3 bg-slate-900/50 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none resize-none text-white placeholder:text-slate-600"
                   ></textarea>
                 </div>
 
                 <div className="pt-2">
                   <button 
                     type="submit"
-                    className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-md flex items-center justify-center gap-2"
+                    className="w-full bg-white text-slate-950 py-3 rounded-xl font-bold hover:bg-violet-200 transition-all shadow-md flex items-center justify-center gap-2"
                   >
                     Send Message <Send className="w-4 h-4" />
                   </button>
@@ -182,8 +182,8 @@ export const HelpDeskView: React.FC<HelpDeskViewProps> = ({ onBack }) => {
               </form>
             )}
             
-            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-               <p className="text-xs text-slate-400">
+            <div className="mt-8 pt-6 border-t border-slate-800 text-center">
+               <p className="text-xs text-slate-500">
                  Support Hours: Mon-Fri, 9:00 AM - 7:00 PM IST
                </p>
             </div>

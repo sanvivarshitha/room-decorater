@@ -1,5 +1,4 @@
 
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult } from "../types";
 
@@ -15,147 +14,89 @@ Follow these instructions strictly:
 The user has provided a room image, a specific Event Type (e.g., Birthday, Memorial, Diwali), and a Budget constraint.
 ALL suggestions MUST be appropriate for this specific event and fit within the approximate budget.
 
-2. Room Understanding
+2. Language & Localization (CRITICAL)
+- The user has selected a specific language. 
+- You MUST output ALL descriptive text (names, descriptions, reasons, tips, instructions) in that target language.
+- However, keep the JSON Property Keys (e.g., 'roomAnalysis', 'layout', 'themes') in ENGLISH. Only the values should be translated.
+- If the language is an Indian language (Hindi, Tamil, etc.), prices should still be in INR.
+- If the language is international, prices should still be in INR (as the app is configured for India), but you can mention the context.
+
+3. Room Understanding
 Describe the room layout, lighting, colors, size, open spaces, and furniture.
 Identify areas suitable for decoration (walls, corners, ceilings, entrance, etc.).
 
-3. AI Spatial Measurement (NEW)
+4. AI Spatial Measurement (NEW)
 Estimate the room's physical dimensions based on visual reference points in the image.
 - Use standard objects as reference (e.g., Standard Door Height ~7ft, Sofa Length ~6-7ft, Queen Bed ~5ft wide).
 - Estimate 'estimatedWidth', 'estimatedHeight', and 'wallSpaceAvailable'.
 - Provide a 'notes' field explaining what object you used as a reference.
-- Provide 2-3 'decorFitAdvice' tips based on these measurements (e.g., "The main wall is approx 10ft wide, so a 6ft circular backdrop will fit perfectly with 2ft clearance on each side").
+- Provide 2-3 'decorFitAdvice' tips based on these measurements.
 
-4. AI Lighting Simulation Strategy (NEW)
+5. AI Lighting Simulation Strategy (NEW)
 Analyze existing light sources and shadows in the image. Provide 3-4 specific 'lightingSuggestions' to enhance depth and ambience.
-Examples:
-- "Place warm LED strips along the floor skirting to counter dark shadows in corners."
-- "Use fairy lights behind the sheer curtains to create a soft glow."
-- "Backlight the TV unit or sofa to create depth."
-- "Focus a spotlight on the main photo zone to eliminate face shadows."
 
-5. AI Photo Zone Scout (NEW)
+6. AI Photo Zone Scout (NEW)
 Identify 1-2 prime spots in the room that would serve as the best "Photo Zones".
 For each zone, determine:
-- 'location': Where exactly in the room (e.g., "The blank wall opposite the window").
-- 'lighting': Why the lighting here is ideal (e.g., "Soft natural light from side window creates flattering shadows").
-- 'standingSpot': Where the subject should stand vs where the photographer should stand (e.g., "Subject stands 2ft in front of backdrop; Photographer shoots from doorway").
-- 'reason': Why this composition works (e.g., "Clean background with depth of field").
+- 'location': Where exactly in the room.
+- 'lighting': Why the lighting here is ideal.
+- 'standingSpot': Where the subject should stand vs where the photographer should stand.
+- 'reason': Why this composition works.
 
-6. Safety Recommendations (CRITICAL)
+7. Safety Recommendations (CRITICAL)
 Analyze the room for potential hazards and provide 3-5 specific safety tips.
-Examples: "Avoid fire/candles near curtains", "Don't place heavy decor on weak plaster walls", "Use command hooks instead of nails to protect wall integrity", "Keep wires/power cords away from walking paths/kids".
 
-7. AI Crowd Capacity Planner (NEW)
+8. AI Crowd Capacity Planner (NEW)
 Analyze the room's floor area to estimate crowd capacity for a comfortable event.
-- 'totalCapacity': Estimated range of total people (e.g., "15-20 pax").
+- 'totalCapacity': Estimated range of total people.
 - 'standingCapacity': Max people if standing/cocktail style.
-- 'seatingCapacity': Max people if seated (based on visible/potential furniture).
-- 'movementAdvice': Specific advice on where to place decor to ensure flow (e.g., "Avoid floor decor near the hallway entrance").
-- 'zoneAdvice': Advice to prevent overcrowding key areas (e.g., "Place cake cutting table in the corner, not the center, to allow photo gathering").
+- 'seatingCapacity': Max people if seated.
+- 'movementAdvice': Specific advice on where to place decor to ensure flow.
+- 'zoneAdvice': Advice to prevent overcrowding key areas.
 
-8. Clutter Removal Recommendation (Conditional)
-Analyze the room for visual clutter (laundry, piled papers, random boxes, tangled wires, misplaced shoes, etc.).
-- Set 'hasClutter' to true ONLY if these items are visible and would negatively impact the decoration aesthetic.
-- If 'hasClutter' is true, provide 2-3 specific 'recommendations' on what to remove, hide, or reposition (e.g., "Move the laundry basket behind the door", "Hide the power strip behind the sofa", "Clear the coffee table surface").
-- If the room is already tidy, set 'hasClutter' to false.
+9. Clutter Removal Recommendation (Conditional)
+Analyze the room for visual clutter.
+- Set 'hasClutter' to true ONLY if items visible would negatively impact the aesthetic.
+- If true, provide 'recommendations'.
 
-9. Generate 5-7 Decoration Themes
+10. Generate 5-7 Decoration Themes
 Create distinct themes specifically for the requested Event Type.
-Examples:
-- If "Birthday": Elegant Birthday, Cartoon Theme, Pastel Party.
-- If "Memorial/Death Anniversary": Serene White Floral, Candlelight Remembrance, Subtle & Respectful.
-- If "Cultural": Specific to the culture (e.g., Traditional Marigold for Diwali).
 
-10. Event Color Palette Generator (NEW)
+11. Event Color Palette Generator (NEW)
 For EACH theme, generate a highly specific Color Palette.
-- Provide 3-5 colors with specific descriptive names (e.g., "Blush Pink", "Champagne Gold") and valid HEX CODES.
+- Provide 3-5 colors with specific descriptive names and valid HEX CODES.
 - Describe the specific 'mood' created by this palette.
-- Explain 'whySuitsRoom': Analyze the room's existing wall color/furniture and explain why this palette complements it (e.g., "The Rose Gold accents will pop against the existing cream walls...").
+- Explain 'whySuitsRoom': Analyze the room's existing wall color/furniture and explain why this palette complements it.
 
-11. Low Budget DIY Logic (IMPORTANT)
+12. Low Budget DIY Logic (IMPORTANT)
 IF the user's budget is very low (below ₹1000 INR), you MUST provide a 'diyOptions' array for each theme.
-Instead of expensive store-bought items, suggest:
-- Handmade paper flowers (using chart paper/tissue).
-- DIY garlands or bunting using A4 paper/newspaper.
-- Hand-drawn or printed banners.
-- DIY balloon clusters.
-- Repurposing existing home items (fairy lights, dupattas).
-Provide clear, simple steps for these DIY ideas.
 
-12. Decoration Template for Each Theme
-Include backdrop, balloon details (if appropriate for event), lighting, special elements, and specific placement instructions.
+13. Decoration Template for Each Theme
+Include backdrop, balloon details, lighting, special elements, and specific placement instructions.
 
-13. AI Table Setup Designer (NEW)
-If a table is visible in the room (dining table, coffee table) OR if a table is typically needed for this event (cake cutting):
-Generate a structured 'tableSetupPlan' object:
-- 'suitableTableFound': Boolean (true if room has a table, false if one needs to be brought in).
-- 'placement': Which table to use or where to place a rental table.
-- 'cakePlacement': Optimal spot for the cake/main focal point (e.g., "Center elevated on a wooden crate").
-- 'propsArrangement': How to arrange supporting decor (e.g., "Frame the cake with two tall vases").
-- 'centerpieceIdeas': Specific centerpiece suggestion.
-- 'foodLayout': Advice on arranging trays/snacks (e.g., "Tiered trays on the left, drinks on the right").
+14. AI Table Setup Designer (NEW)
+If a table is visible or needed, generate a 'tableSetupPlan'.
 
-14. Installation & Stability Guide (NEW)
-For EACH theme, provide 3-4 practical "Pro Tips" on how to install the decor securely and professionally.
-Examples:
-- "Use masking tape first, then double-sided tape to protect wall paint."
-- "Use fishing line for invisible balloon arches."
-- "Weight down backdrop stands with sandbags or water bottles."
-- "Tie balloons in pairs before twisting into clusters for stability."
+15. Installation & Stability Guide (NEW)
+For EACH theme, provide 3-4 practical "Pro Tips" on how to install the decor securely.
 
-15. Time Estimates (NEW)
-For EACH theme, estimate the time required for major setup tasks (e.g., 'Balloon Arch: 30 mins', 'Fairy Lights: 10 mins') for a team of 2 people.
-Calculate the total estimated time in minutes.
-Classify difficulty as 'Easy', 'Moderate', or 'Hard'.
+16. Time Estimates (NEW)
+For EACH theme, estimate the time required.
 
-16. Decor Placement Blueprint (Text-style)
-Create a simple, spatial ASCII-style text diagram of the room layout showing where decorations should go.
-- Use tags like [Window], [Door], [Bed], [Table] to represent existing furniture/structure.
-- Use *Asterisks* or >Arrows< to label new decor items (e.g., *Balloon Arch*, >Backdrop<).
-- Arrange them to spatially match the room's layout roughly.
-Example:
-[Window]---- *Fairy Lights* ----[Wall]
-      |
-[Bed] |      *Balloon Cluster (Left)*
-      |
-[Door]--- >Welcome Sign<
+17. Decor Placement Blueprint (Text-style)
+Create a simple, spatial ASCII-style text diagram of the room layout.
 
-17. Decoration Durability Prediction (NEW)
+18. Decoration Durability Prediction (NEW)
 For EACH theme, estimate the durability/lifespan of the main decor elements.
-Examples:
-- "Latex Balloons: 8-12 hours (Will oxidize/shrink)"
-- "Foil Balloons: 2-3 days"
-- "Fresh Flowers: 24 hours (Keep hydrated)"
-- "Paper Decor: Indefinite (Until removed)"
-- "Tape/Adhesive: 4-6 hours (Dependent on wall texture)"
 
-18. AI Sound Ambience Recommender (NEW)
-For EACH theme, suggest 2-3 music playlists or genres that perfectly match the mood and event type.
-- 'name': Playlist or Genre name.
-  Examples:
-  - "Soft Acoustic" (for Anniversary/Date Night)
-  - "Kids Cartoon Hits" (for Kids Birthday)
-  - "Bollywood Romantic" (for Engagement)
-  - "Neon Party EDM" (for Modern Party)
-  - "Traditional Sitar & Flute" (for Cultural/Puja)
-- 'genre': Broad genre.
-- 'mood': Vibe of the music.
-- 'reason': Why it fits the theme.
+19. AI Sound Ambience Recommender (NEW)
+For EACH theme, suggest 2-3 music playlists or genres.
 
-19. Cleaning & Removal Plan (NEW)
+20. Cleaning & Removal Plan (NEW)
 For EACH theme, provide a practical post-event cleanup guide.
-- 'tapeRemoval': How to remove adhesive without peeling wall paint (e.g., "Heat tape with hairdryer first").
-- 'reusableItems': List items that can be packed and reused (e.g., "Fairy lights, Foil balloons, Banner").
-- 'disposalInstructions': How to dispose of waste (e.g., "Pop balloons safely, recycle paper").
-- 'wallCare': Tips to fix any minor marks or residue.
 
-20. Decoration Item List
-For each item, give a realistic product name, source (Amazon/Flipkart/Local), approximate price in INR, quantity, and reason.
-ENSURE the total cost is close to the user's specified budget.
-
-21. Total Budget
-Calculate total cost and classify as Budget-Friendly, Moderate, or Premium.
+21. Decoration Item List
+For each item, give a realistic product name, source, approximate price in INR, quantity, and reason.
 
 22. Choose the Best Theme
 Analyze the room again and recommend the theme that fits BEST.
@@ -173,7 +114,8 @@ const getAIClient = () => {
 export const analyzeRoomImage = async (
   base64Image: string,
   eventType: string,
-  budget: string
+  budget: string,
+  language: string = 'English'
 ): Promise<AnalysisResult> => {
   const ai = getAIClient();
 
@@ -181,26 +123,11 @@ export const analyzeRoomImage = async (
   Analyze this room image for a "${eventType}" event.
   The user has a budget target of: ${budget}.
   
+  CRITICAL: The user's preferred language is: "${language}". 
+  All descriptions, names, tips, and reasoning must be translated into ${language}.
+  Keep the JSON Keys in English.
+  
   Provide a comprehensive decoration plan in JSON format.
-  Ensure themes are culturally appropriate for "${eventType}" and respect the budget "${budget}".
-  
-  KEY REQUIREMENT: Generate a detailed "paletteDetails" object for every theme. 
-  Include specific HEX codes, mood description, and reasoning for why the colors fit this specific room.
-  
-  Include "estimatedDimensions" and "decorFitAdvice".
-  Include "lightingSuggestions" based on room shadows and structure.
-  Include "photoZones" with specific advice on where to stand and lighting.
-  Include "crowdCapacity" estimates and flow advice.
-  Include "clutterCheck" to identify and suggest removal of clutter ONLY if present.
-  Include "safetyTips".
-  Include "stabilityTips".
-  Include "timeEstimates".
-  Include "durabilityEstimates" for key items.
-  Include "tableSetupPlan" with cake placement, props, and food layout.
-  Include "musicPlaylists" to match the theme (e.g., Soft acoustic for anniversary, Cartoon songs for kids).
-  Include a text-based "blueprint" diagram for layout.
-  Include "cleaningPlan" for post-party removal and care.
-  If the budget is low (e.g., < 1000), include "diyOptions".
   `;
 
   try {
